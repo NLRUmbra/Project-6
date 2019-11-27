@@ -68,6 +68,7 @@ void Graph::removeEdge(string label_1, string label_2) {
 }
 
 unsigned long Graph::shortestPath(string StartLabel, string Endlabel, vector<string> &path) {
+	//cout << "what" << endl;
 	set<int> sptSet;
 	vector<unsigned long> distance;
 	distance.resize(count);
@@ -85,35 +86,39 @@ unsigned long Graph::shortestPath(string StartLabel, string Endlabel, vector<str
 			v2 = &v;
 		}
 	}
-	for (int i = 0; i < distance.size(); i++) {
+	for (int i = 0; i < stuff.size(); i++) {
 		if (v1->get_position() == i) {
-			distance[i] = 0;
+			distance.push_back(0);
 		}
-		distance[i] = 10000000000;
+		distance.push_back(10000000000);
 	}
-
+	//cout << 1 << endl;
 	while (sptSet.size() != count) {
 		int smol = 10000000000;
 		int position;
+		//cout << smol << endl;
 		for (int j = 0; j < distance.size(); j++) {
-				if (smol > distance[j]) {
+				if (smol > distance[j] && sptSet.find(j) == sptSet.end()) {
 					smol = distance[j];
 					position = j;
+					//cout << position << endl;
+					//cout << smol << endl;
 				}
 			}
 		
 		sptSet.emplace(position);
 		vector<unsigned long> depression = *matrix.at(position);
 		for (int k = 0; k < depression.size(); k++) {//going through a specific vector and checking the distance to other connected vectors
-			if (depression.at(k) != 0 && depression.at(k)+smol <distance.at(k)) {
+			if (depression.at(k) != 0 && depression.at(k) + smol < distance.at(k)) {
 				distance.at(k) = smol + depression.at(k);
-			}
 
-			important_bit.at(k).clear();
-			for (int gg = 0; gg < important_bit.at(position).size(); gg++) {
-				important_bit.at(k).push_back(important_bit.at(position).at(gg));
+
+				important_bit.at(k).clear();
+				for (int gg = 0; gg < important_bit.at(position).size(); gg++) {
+					important_bit.at(k).push_back(important_bit.at(position).at(gg));
+				}
+				important_bit.at(k).push_back(stuff[k].get_label());
 			}
-			important_bit.at(k).push_back(stuff[k].get_label());
 		}
 		//want to go through a specific vector inside the matrix this is determined by the position we found
 		//for (int z = 0; z < matrix.at(position)->size(); z++) {
