@@ -1,3 +1,4 @@
+//Noah McElroy PP6
 #include "Graph.h"
 void Graph::addVertex(string label) {
 	
@@ -11,35 +12,35 @@ void Graph::addVertex(string label) {
 }
 
 void Graph::removeVertex(string label) {
-	Vertex* v1 = nullptr;
+	Vertex v1;//use this to keep track of position
 	for (auto v : stuff) {
-		if (v.get_label() == label) {
-			v1 = &v;
+		if (v.get_label() == label) {//erasing it from the vector of vertices
+			v1 = v;
 			stuff.erase(stuff.begin() + v.get_position());
 			count--;
 		}
 	}
-	auto old_matrix = matrix;
+	auto old_matrix = matrix;//copying our matrix so we can update it
 	matrix = {};
-	for (int b = 0; b < count; b++) {
+	for (int b = 0; b < count; b++) {//refilling our matrix
 		matrix.push_back(new vector<unsigned long>());
 	}
 	for (auto g : matrix) {
 		g->resize(count);
 	}
-	for (int i = 0; i < count + 1; i++) {
-		if (i == v1->get_position()) {
+	for (int i = 0; i < count + 1; i++) {//inputting values of the matrix in the correct positions after the vertex has been removed
+		if (i == v1.get_position()) {
 			continue;
 		}
 		for (int j = 0; j < count + 1; j++) {
-			if (j == v1->get_position()) {
+			if (j == v1.get_position()) {
 				continue;
 
 			}
-			if (j < v1->get_position()) {
+			if (j < v1.get_position()) {
 				matrix.at(i)->at(j) = (old_matrix.at(i)->at(j));
 			}
-			if (j > v1->get_position())
+			if (j > v1.get_position())
 				matrix.at(i - 1)->at(j - 1) = (old_matrix.at(i)->at(j));
 		}
 	}
@@ -47,20 +48,34 @@ void Graph::removeVertex(string label) {
 }
 
 void Graph::addEdge(string label_1, string label_2, unsigned long weight) {
-	Vertex* v1 = nullptr;
-	Vertex* v2 = nullptr;
+	Vertex v1;//use these two to keep track of the position where the labels occur
+	Vertex v2;
 	for (auto v : stuff) {
+		//	cout << v.get_label() << "  ";
+			//cout << label_1 << endl;
 		if (v.get_label() == label_1) {
-			v1 = &v;
+			v1 = v;
+			//cout << v1->get_label() << endl;
+			//cout << v1->get_position() << "  ";
 		}
 		if (v.get_label() == label_2) {
-			v2 = &v;
+			v2 = v;
+			//cout << v2->get_label() << endl;
+			//cout << v2->get_position() << endl;
 		}
+		//cout << weight << endl;
 	}
-	if (v1 != nullptr && v2 != nullptr) {//creates the edge which is bidirectional
-		matrix.at(v1->get_position())->at(v2->get_position()) = weight;
-		matrix.at(v2->get_position())->at(v1->get_position()) = weight;
-	}
+		//creates the edge which is bidirectional
+			matrix.at(v1.get_position())->at(v2.get_position()) = weight;
+			matrix.at(v2.get_position())->at(v1.get_position()) = weight;
+		
+	
+	/*for (auto *c : matrix) {
+		for (auto x : *c) {
+			cout << x << " ";
+		}
+		cout << endl;
+	}*/
 }
 
 void Graph::removeEdge(string label_1, string label_2) {
@@ -69,6 +84,12 @@ void Graph::removeEdge(string label_1, string label_2) {
 
 unsigned long Graph::shortestPath(string StartLabel, string Endlabel, vector<string> &path) {
 	//cout << "what" << endl;
+	for (auto *c : matrix) {
+		for (auto x : *c) {
+			cout << x << " ";
+		}
+		cout << endl;
+	}
 	set<int> sptSet;
 	vector<unsigned long> distance;
 	distance.resize(count);
@@ -76,25 +97,25 @@ unsigned long Graph::shortestPath(string StartLabel, string Endlabel, vector<str
 	for (int b = 0; b < count; b++) {
 		important_bit.push_back({});
 	}
-	Vertex* v1 = nullptr;
-	Vertex* v2 = nullptr;
+	Vertex v1;
+	Vertex v2;
 	for (auto v : stuff) {
 		if (v.get_label() == StartLabel) {
-			v1 = &v;
+			v1 = v;
 		}
 		if (v.get_label() == Endlabel) {
-			v2 = &v;
+			v2 = v;
 		}
 	}
 	for (int i = 0; i < stuff.size(); i++) {
-		if (v1->get_position() == i) {
+		if (v1.get_position() == i) {
 			distance.push_back(0);
 		}
-		distance.push_back(10000000000);
+		distance.push_back(100000);
 	}
 	//cout << 1 << endl;
 	while (sptSet.size() != count) {
-		int smol = 10000000000;
+		unsigned long smol = 100000;
 		int position;
 		//cout << smol << endl;
 		for (int j = 0; j < distance.size(); j++) {
@@ -127,11 +148,11 @@ unsigned long Graph::shortestPath(string StartLabel, string Endlabel, vector<str
 	//	for (auto v : *(matrix[position])) {
 		//	if(v!= 0)
 		//}
-	
+		
 	}
 	path.push_back(StartLabel);
-	for (int life = 0; life < important_bit.at(v2->get_position()).size(); life++) {
-		path.push_back(important_bit.at(v2->get_position()).at(life));
+	for (int life = 0; life < important_bit.at(v2.get_position()).size(); life++) {
+		path.push_back(important_bit.at(v2.get_position()).at(life));
 	}
-	return distance.at(v2->get_position());
+	return distance.at(v2.get_position());//outputting final path
 }
